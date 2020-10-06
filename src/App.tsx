@@ -1,17 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
-const Square = () => (
-  <button className="square">
-    {/* TODO */}
-  </button>
-);
+interface SquareProps {
+  value: number
+}
+
+const Square = (props: SquareProps) => {
+  const [value, setValue] = useState('');
+
+  return (
+    <button className="square" onClick={() => setValue('X')}>
+      {value}
+    </button>
+  )
+};
 
 const Board = () => {
   const status: string = 'Next player: X';
 
   const renderSquare = (i: number) => {
-    return <Square />;
+    return <Square value={i} />;
   };
 
   return (
