@@ -13,9 +13,9 @@ const Square = (props: SquareProps) => (
 );
 
 const Board = () => {
-  const status: string = 'Next player: X';
   const [squares, setSquares] = useState<Array<string>>([]);
   const [xIsNext, setXIsNext] = useState<boolean>(true);
+  const status: string = `Next player: ${xIsNext ? 'X' : 'O'}`;
 
   const renderSquare = (i: number) => {
     return <Square value={squares[i]} onClick={() => handleClick(i)} />;
