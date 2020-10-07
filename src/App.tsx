@@ -2,24 +2,28 @@ import React, { useState } from 'react';
 import './App.css';
 
 interface SquareProps {
-  value: number
+  value: string,
+  onClick: () => void;
 }
 
-const Square = (props: SquareProps) => {
-  const [value, setValue] = useState('');
-
-  return (
-    <button className="square" onClick={() => setValue('X')}>
-      {value}
-    </button>
-  )
-};
+const Square = (props: SquareProps) => (
+  <button className="square" onClick={() => props.onClick()}>
+    {props.value}
+  </button>
+);
 
 const Board = () => {
   const status: string = 'Next player: X';
+  const [squares, setSquares] = useState<Array<string>>([]);
 
   const renderSquare = (i: number) => {
-    return <Square value={i} />;
+    return <Square value={squares[i]} onClick={() => handleClick(i)} />;
+  };
+
+  const handleClick = (i: number) => {
+    const clonedSquares = squares.slice();
+    clonedSquares[i] = 'X';
+    setSquares(clonedSquares);
   };
 
   return (
