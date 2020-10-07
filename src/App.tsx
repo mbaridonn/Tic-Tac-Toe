@@ -15,7 +15,14 @@ const Square = (props: SquareProps) => (
 const Board = () => {
   const [squares, setSquares] = useState<Array<string>>([]);
   const [xIsNext, setXIsNext] = useState<boolean>(true);
-  const status: string = `Next player: ${xIsNext ? 'X' : 'O'}`;
+  let status: string = `Next player: ${xIsNext ? 'X' : 'O'}`;
+
+  const winner = calculateWinner(squares);
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+  }
 
   const renderSquare = (i: number) => {
     return <Square value={squares[i]} onClick={() => handleClick(i)} />;
@@ -23,6 +30,11 @@ const Board = () => {
 
   const handleClick = (i: number) => {
     const clonedSquares = squares.slice();
+
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+
     clonedSquares[i] = xIsNext ? 'X' : 'O';
     setSquares(clonedSquares);
     setXIsNext(!xIsNext);
@@ -64,5 +76,26 @@ const Game = () => (
 
 const App = () =>
   <Game />;
+
+
+function calculateWinner(squares: Array<string>) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
 
 export default App;
