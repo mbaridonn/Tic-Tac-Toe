@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
+import { isPropertySignature } from 'typescript';
 import './App.css';
 
 interface SquareProps {
   value: string,
   onClick: () => void;
+}
+
+interface BoardProps {
+  squares: Array<string>,
+  onClick: (value: number) => void;
 }
 
 const Square = (props: SquareProps) => (
@@ -12,37 +18,13 @@ const Square = (props: SquareProps) => (
   </button>
 );
 
-const Board = () => {
-  const [squares, setSquares] = useState<Array<string>>([]);
-  const [xIsNext, setXIsNext] = useState<boolean>(true);
-  let status: string = `Next player: ${xIsNext ? 'X' : 'O'}`;
-
-  const winner = calculateWinner(squares);
-  if (winner) {
-    status = 'Winner: ' + winner;
-  } else {
-    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
-  }
-
+const Board = (props: BoardProps) => {
   const renderSquare = (i: number) => {
-    return <Square value={squares[i]} onClick={() => handleClick(i)} />;
-  };
-
-  const handleClick = (i: number) => {
-    const clonedSquares = squares.slice();
-
-    if (calculateWinner(squares) || squares[i]) {
-      return;
-    }
-
-    clonedSquares[i] = xIsNext ? 'X' : 'O';
-    setSquares(clonedSquares);
-    setXIsNext(!xIsNext);
+    return <Square value={props.squares[i]} onClick={() => props.onClick(i)} />;
   };
 
   return (
     <div>
-      <div className="status">{status}</div>
       <div className="board-row">
         {renderSquare(0)}
         {renderSquare(1)}
@@ -60,19 +42,47 @@ const Board = () => {
       </div>
     </div>
   );
-}
+};
 
-const Game = () => (
-  <div className="game">
-    <div className="game-board">
-      <Board />
+const Game = () => {
+  const [history, setHistory] = useState<Array<Array<string>>>([Array(9).fill(null)]);
+  const [xIsNext, setXIsNext] = useState<boolean>(true);
+
+  const currentSquares = history[history.length - 1]; //last element of history
+  const winner = calculateWinner(currentSquares);
+  let status;
+
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+  }
+
+  const handleClick = (i: number) => {
+    const currentSquares = history[history.length - 1];
+    const squares = currentSquares.slice();
+
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    squares[i] = xIsNext ? 'X' : 'O';
+
+    setHistory(history.concat([squares]));
+    setXIsNext(!xIsNext);
+  }
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board squares={currentSquares} onClick={(i) => handleClick(i)} />
+      </div>
+      <div className="game-info">
+        <div>{status}</div>
+        <ol>{/* TODO */}</ol>
+      </div>
     </div>
-    <div className="game-info">
-      <div>{/* status */}</div>
-      <ol>{/* TODO */}</ol>
-    </div>
-  </div>
-);
+  );
+};
 
 const App = () =>
   <Game />;
