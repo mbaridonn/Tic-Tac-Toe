@@ -15,6 +15,7 @@ const Square = (props: SquareProps) => (
 const Board = () => {
   const status: string = 'Next player: X';
   const [squares, setSquares] = useState<Array<string>>([]);
+  const [xIsNext, setXIsNext] = useState<boolean>(true);
 
   const renderSquare = (i: number) => {
     return <Square value={squares[i]} onClick={() => handleClick(i)} />;
@@ -22,8 +23,9 @@ const Board = () => {
 
   const handleClick = (i: number) => {
     const clonedSquares = squares.slice();
-    clonedSquares[i] = 'X';
+    clonedSquares[i] = xIsNext ? 'X' : 'O';
     setSquares(clonedSquares);
+    setXIsNext(!xIsNext);
   };
 
   return (
