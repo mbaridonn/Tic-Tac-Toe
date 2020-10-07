@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { isPropertySignature } from 'typescript';
 import './App.css';
 
 interface SquareProps {
@@ -47,8 +46,9 @@ const Board = (props: BoardProps) => {
 const Game = () => {
   const [history, setHistory] = useState<Array<Array<string>>>([Array(9).fill(null)]);
   const [xIsNext, setXIsNext] = useState<boolean>(true);
+  const [stepNumber, setStepNumber] = useState<number>(0);
 
-  const currentSquares = history[history.length - 1]; //last element of history
+  const currentSquares = history[stepNumber]; //last element of history
   const winner = calculateWinner(currentSquares);
   let status;
 
@@ -58,8 +58,25 @@ const Game = () => {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
 
+  const moves = history.map((step, move) => {
+    const desc = move ?
+      'Go to move #' + move :
+      'Go to game start';
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{desc}</button>
+      </li>
+    );
+  });
+
+  const jumpTo = (step: number) => {
+    setStepNumber(step);
+    setXIsNext((step % 2) === 0);
+  };
+
   const handleClick = (i: number) => {
-    const currentSquares = history[history.length - 1];
+    let currentHistory = history.slice(0, stepNumber + 1);
+    const currentSquares = currentHistory[currentHistory.length - 1];
     const squares = currentSquares.slice();
 
     if (calculateWinner(squares) || squares[i]) {
@@ -67,7 +84,8 @@ const Game = () => {
     }
     squares[i] = xIsNext ? 'X' : 'O';
 
-    setHistory(history.concat([squares]));
+    setHistory(currentHistory.concat([squares]));
+    setStepNumber(currentHistory.length);
     setXIsNext(!xIsNext);
   }
 
@@ -78,7 +96,7 @@ const Game = () => {
       </div>
       <div className="game-info">
         <div>{status}</div>
-        <ol>{/* TODO */}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
